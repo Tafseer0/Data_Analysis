@@ -33,7 +33,7 @@ function detectColumns(headers: string[], abbreviation?: string): {
   yandexStatusIdx: number;
 } {
   return {
-    statusIdx: findColumnIndex(headers, ["status", "state", "result"]),
+    statusIdx: findColumnIndex(headers, ["status", "state", "result", "url status"]),
     marketIdx: findColumnIndex(headers, ["market", "country", "region", "location", "geo"]),
     monthIdx: findColumnIndex(headers, ["month", "date", "period", "time"]),
     contentOwnerIdx: findColumnIndex(headers, ["content owner", "owner", "content_owner", "contentowner", "rights holder", "rightsholder"]),
