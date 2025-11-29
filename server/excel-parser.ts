@@ -120,14 +120,14 @@ function processSheet(
     let statusRaw = columns.statusIdx >= 0 ? String(row[columns.statusIdx] || "") : "";
     let urlRaw = columns.urlIdx >= 0 ? String(row[columns.urlIdx] || "") : "";
     
-    // For USR sheet, use Google/Bing/Yandex status columns
-    if (abbreviation === "USR") {
+    // For USR sheet, use Google/Bing/Yandex status columns if available
+    if (abbreviation === "USR" && !statusRaw.trim()) {
       const googleStatus = columns.googleStatusIdx >= 0 ? String(row[columns.googleStatusIdx] || "").trim() : "";
       const bingStatus = columns.bingStatusIdx >= 0 ? String(row[columns.bingStatusIdx] || "").trim() : "";
       const yandexStatus = columns.yandexStatusIdx >= 0 ? String(row[columns.yandexStatusIdx] || "").trim() : "";
       
       // Use the first available status from Google, Bing, or Yandex
-      statusRaw = googleStatus || bingStatus || yandexStatus || statusRaw;
+      statusRaw = googleStatus || bingStatus || yandexStatus;
     }
     
     // If we can't find important columns, try first few columns
