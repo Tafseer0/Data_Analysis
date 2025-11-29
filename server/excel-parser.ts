@@ -173,91 +173,82 @@ function processSheet(
   let activeCount = 0;
   let removedCount = 0;
 
-  const startRow = 1;
+  // Cache column indices locally for faster access
+  const {
+    statusIdx, urlIdx, marketIdx, monthIdx, contentOwnerIdx,
+    googleStatusIdx, bingStatusIdx, yandexStatusIdx
+  } = columns;
 
-  for (let i = startRow; i < jsonData.length; i++) {
+  const isUSR = abbreviation === "USR";
+
+  for (let i = 1; i < jsonData.length; i++) {
     const row = jsonData[i] as unknown[];
     if (!row || row.length === 0) continue;
 
-    // Only skip completely empty rows
-    const hasAnyData = row.some(cell => {
-      const cellStr = String(cell || "").trim();
-      return cellStr !== "" && cellStr !== "null" && cellStr !== "undefined";
-    });
-    if (!hasAnyData) continue;
+    // Fast path: check if row has any data before processing
+    let hasData = false;
+    for (let j = 0; j < row.length; j++) {
+      const cell = row[j];
+      if (cell !== null && cell !== undefined && cell !== "" && cell !== "null" && cell !== "undefined") {
+        hasData = true;
+        break;
+      }
+    }
+    if (!hasData) continue;
 
-    // Get values from detected columns, or use first few columns as fallback
-    let statusRaw = columns.statusIdx >= 0 ? String(row[columns.statusIdx] || "") : "";
-    let urlRaw = columns.urlIdx >= 0 ? String(row[columns.urlIdx] || "") : "";
-    
-    // For USR sheet, check all three Google/Bing/Yandex status columns
-    let normalizedStatus: "active" | "removed" | "unknown" = "unknown";
-    if (abbreviation === "USR") {
-      const googleStatus = columns.googleStatusIdx >= 0 ? String(row[columns.googleStatusIdx] || "").trim() : "";
-      const bingStatus = columns.bingStatusIdx >= 0 ? String(row[columns.bingStatusIdx] || "").trim() : "";
-      const yandexStatus = columns.yandexStatusIdx >= 0 ? String(row[columns.yandexStatusIdx] || "").trim() : "";
-      
-      // For USR, if ANY column has "Approved" or "Up", count as Active
-      // If all are "Pending", count as Removed
-      const allStatuses = [googleStatus, bingStatus, yandexStatus].filter(s => s);
-      const hasActiveStatus = allStatuses.some(s => s.toLowerCase() === "approved" || s.toLowerCase() === "up");
-      const allPending = allStatuses.length > 0 && allStatuses.every(s => s.toLowerCase() === "pending");
-      
-      if (hasActiveStatus) {
-        normalizedStatus = "active";
-        statusRaw = "Approved/Up";
-      } else if (allPending) {
-        normalizedStatus = "removed";
-        statusRaw = "Pending";
-      } else if (allStatuses.length > 0) {
-        statusRaw = allStatuses[0];
-      }
-    } else {
-      // For other sheets, use standard column detection
-      if (!statusRaw.trim()) {
-        statusRaw = "";
-      }
-      const status = statusRaw.trim() || "Unknown";
-      normalizedStatus = normalizeStatus(status, abbreviation);
-    }
-    
-    // If we can't find important columns, try first few columns
-    if (!statusRaw && columns.statusIdx === -1 && row[0]) {
-      statusRaw = String(row[0]);
-      if (abbreviation !== "USR") {
-        normalizedStatus = normalizeStatus(statusRaw, abbreviation);
-      }
-    }
-    if (!urlRaw && columns.urlIdx === -1 && row[1]) {
-      urlRaw = String(row[1]);
-    }
-
-    const marketRaw = columns.marketIdx >= 0 ? String(row[columns.marketIdx] || "") : "";
-    const monthRaw = columns.monthIdx >= 0 ? String(row[columns.monthIdx] || "") : "";
-    const contentOwnerRaw = columns.contentOwnerIdx >= 0 ? String(row[columns.contentOwnerIdx] || "") : "";
+    // Extract and trim values once
+    let statusRaw = statusIdx >= 0 ? String(row[statusIdx] || "").trim() : "";
+    let urlRaw = urlIdx >= 0 ? String(row[urlIdx] || "").trim() : "";
+    const marketRaw = marketIdx >= 0 ? String(row[marketIdx] || "").trim() : "";
+    const monthRaw = monthIdx >= 0 ? String(row[monthIdx] || "").trim() : "";
+    const contentOwnerRaw = contentOwnerIdx >= 0 ? String(row[contentOwnerIdx] || "").trim() : "";
 
     // Skip rows that have neither status nor URL
-    if (!statusRaw.trim() && !urlRaw.trim()) continue;
+    if (!statusRaw && !urlRaw) continue;
 
-    const status = statusRaw.trim() || "Unknown";
-    if (abbreviation !== "USR" && normalizedStatus === "unknown") {
-      normalizedStatus = normalizeStatus(status, abbreviation);
+    // Determine normalized status
+    let normalizedStatus: "active" | "removed" | "unknown" = "unknown";
+    if (isUSR) {
+      const googleStatus = googleStatusIdx >= 0 ? String(row[googleStatusIdx] || "").trim() : "";
+      const bingStatus = bingStatusIdx >= 0 ? String(row[bingStatusIdx] || "").trim() : "";
+      const yandexStatus = yandexStatusIdx >= 0 ? String(row[yandexStatusIdx] || "").trim() : "";
+      
+      // Check for active status first (faster)
+      if (
+        (googleStatus === "Approved" || googleStatus === "approved" || googleStatus === "Up" || googleStatus === "up") ||
+        (bingStatus === "Approved" || bingStatus === "approved" || bingStatus === "Up" || bingStatus === "up") ||
+        (yandexStatus === "Approved" || yandexStatus === "approved" || yandexStatus === "Up" || yandexStatus === "up")
+      ) {
+        normalizedStatus = "active";
+        statusRaw = "Approved/Up";
+      } else if (
+        (googleStatus === "Pending" || googleStatus === "pending") &&
+        (bingStatus === "Pending" || bingStatus === "pending") &&
+        (yandexStatus === "Pending" || yandexStatus === "pending")
+      ) {
+        normalizedStatus = "removed";
+        statusRaw = "Pending";
+      } else if (googleStatus || bingStatus || yandexStatus) {
+        statusRaw = googleStatus || bingStatus || yandexStatus;
+      }
+    } else {
+      normalizedStatus = normalizeStatus(statusRaw || (urlRaw ? "" : "Unknown"), abbreviation);
     }
 
     if (normalizedStatus === "active") activeCount++;
     else if (normalizedStatus === "removed") removedCount++;
 
-    const market = marketRaw.trim() || "Unknown";
-    const month = monthRaw.trim() || "";
-    const contentOwner = contentOwnerRaw.trim() || "Unknown";
+    const market = marketRaw || "Unknown";
+    const month = monthRaw;
+    const contentOwner = contentOwnerRaw || "Unknown";
 
     if (month) monthsSet.add(month);
-    if (market && market !== "Unknown") marketsSet.add(market);
-    if (contentOwner && contentOwner !== "Unknown") contentOwnersSet.add(contentOwner);
+    if (market !== "Unknown") marketsSet.add(market);
+    if (contentOwner !== "Unknown") contentOwnersSet.add(contentOwner);
 
     records.push({
-      url: urlRaw.trim(),
-      status,
+      url: urlRaw,
+      status: statusRaw || "Unknown",
       market,
       month,
       contentOwner,
