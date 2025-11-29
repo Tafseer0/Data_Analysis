@@ -7,6 +7,8 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 
@@ -157,9 +159,12 @@ export function DashboardHeader({
                 <DropdownMenuCheckboxItem
                   checked={filters.contentOwners.length === 0}
                   onCheckedChange={() => onFilterChange("contentOwners", [])}
+                  data-testid="checkbox-all-content-owners"
                 >
                   All Content Owners
                 </DropdownMenuCheckboxItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">Select Content Owners</DropdownMenuLabel>
                 {contentOwners.map((owner) => (
                   <DropdownMenuCheckboxItem
                     key={owner}
@@ -170,6 +175,7 @@ export function DashboardHeader({
                         : filters.contentOwners.filter(o => o !== owner);
                       onFilterChange("contentOwners", updated);
                     }}
+                    data-testid={`checkbox-content-owner-${owner.toLowerCase().replace(/\s+/g, '-')}`}
                   >
                     {owner}
                   </DropdownMenuCheckboxItem>

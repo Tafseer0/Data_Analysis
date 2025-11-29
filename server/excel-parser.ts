@@ -5,9 +5,17 @@ import { SHEET_MAPPINGS, SHEET_FULL_NAMES } from "@shared/schema";
 const STATUS_ACTIVE_KEYWORDS = ["active", "up", "live", "online", "available", "approved"];
 const STATUS_REMOVED_KEYWORDS = ["removed", "down", "offline", "deleted", "taken down", "unavailable", "pending"];
 
-function normalizeStatus(status: string): "active" | "removed" | "unknown" {
+function normalizeStatus(status: string, abbreviation?: string): "active" | "removed" | "unknown" {
   if (!status) return "unknown";
   const lower = status.toLowerCase().trim();
+  
+  // For USR sheet, specifically count "approved" and "up" as active, "pending" as removed
+  if (abbreviation === "USR") {
+    if (lower === "approved" || lower === "up") return "active";
+    if (lower === "pending") return "removed";
+    return "unknown";
+  }
+  
   if (STATUS_ACTIVE_KEYWORDS.some(k => lower.includes(k))) return "active";
   if (STATUS_REMOVED_KEYWORDS.some(k => lower.includes(k))) return "removed";
   return "unknown";
@@ -32,6 +40,21 @@ function detectColumns(headers: string[], abbreviation?: string): {
   bingStatusIdx: number;
   yandexStatusIdx: number;
 } {
+  // For USR sheet, use specific column names
+  if (abbreviation === "USR") {
+    return {
+      statusIdx: -1, // USR uses Google/Bing/Yandex columns instead
+      marketIdx: findColumnIndex(headers, ["market scanned", "market"]),
+      monthIdx: findColumnIndex(headers, ["month", "date", "period", "time"]),
+      contentOwnerIdx: findColumnIndex(headers, ["copyright owner", "content owner", "owner"]),
+      urlIdx: findColumnIndex(headers, ["linking url", "url", "link"]),
+      withIdx: findColumnIndex(headers, ["with", "associated", "linked"]),
+      googleStatusIdx: findColumnIndex(headers, ["url status google"]),
+      bingStatusIdx: findColumnIndex(headers, ["url status bing"]),
+      yandexStatusIdx: findColumnIndex(headers, ["url status yandex"]),
+    };
+  }
+
   // For PSSM and PSMP, prioritize "URL Status" column detection
   let statusKeywords = ["status", "state", "result"];
   if (abbreviation === "PSSM" || abbreviation === "PSMP") {
