@@ -70,12 +70,38 @@ function detectColumns(headers: string[], abbreviation?: string): {
     };
   }
 
-  // For PSSM and PSMP, prioritize "URL Status" column detection
-  let statusKeywords = ["status", "state", "result"];
-  if (abbreviation === "PSSM" || abbreviation === "PSMP") {
-    statusKeywords = ["url status", "status"];
+  // For PSSM sheet, use specific column names
+  if (abbreviation === "PSSM") {
+    return {
+      statusIdx: findColumnIndex(headers, ["url status"]),
+      marketIdx: findColumnIndex(headers, ["market scanned", "market"]),
+      monthIdx: findColumnIndex(headers, ["month", "date", "period", "time"]),
+      contentOwnerIdx: findColumnIndex(headers, ["content owner", "owner"]),
+      urlIdx: findColumnIndex(headers, ["listing/posts urls", "listing/posts url", "listing/post urls", "listing/post url", "url", "link"]),
+      withIdx: findColumnIndex(headers, ["with", "associated", "linked"]),
+      googleStatusIdx: findColumnIndex(headers, ["url status google"]),
+      bingStatusIdx: findColumnIndex(headers, ["url status bing"]),
+      yandexStatusIdx: findColumnIndex(headers, ["url status yandex"]),
+    };
   }
 
+  // For PSMP sheet, use specific column names
+  if (abbreviation === "PSMP") {
+    return {
+      statusIdx: findColumnIndex(headers, ["url status (up/down)", "url status"]),
+      marketIdx: findColumnIndex(headers, ["market scanned", "market"]),
+      monthIdx: findColumnIndex(headers, ["month", "date", "period", "time"]),
+      contentOwnerIdx: findColumnIndex(headers, ["content owner", "owner"]),
+      urlIdx: findColumnIndex(headers, ["listing url", "listing/posts urls", "listing/posts url", "listing/post urls", "listing/post url", "url", "link"]),
+      withIdx: findColumnIndex(headers, ["with", "associated", "linked"]),
+      googleStatusIdx: findColumnIndex(headers, ["url status google"]),
+      bingStatusIdx: findColumnIndex(headers, ["url status bing"]),
+      yandexStatusIdx: findColumnIndex(headers, ["url status yandex"]),
+    };
+  }
+
+  // Default fallback for any other sheets
+  let statusKeywords = ["status", "state", "result"];
   return {
     statusIdx: findColumnIndex(headers, statusKeywords),
     marketIdx: findColumnIndex(headers, ["market", "country", "region", "location", "geo"]),
