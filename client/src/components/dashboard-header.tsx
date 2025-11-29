@@ -55,17 +55,20 @@ export function DashboardHeader({
             <Calendar className="h-4 w-4 text-muted-foreground" />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-40 justify-between" data-testid="filter-months-trigger">
+                <Button variant="outline" className="w-48 justify-between" data-testid="filter-months-trigger">
                   {filters.months.length === 0 ? "All Months" : `${filters.months.length} selected`}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuContent align="start" className="w-56 max-h-60 overflow-y-auto">
                 <DropdownMenuCheckboxItem
                   checked={filters.months.length === 0}
                   onCheckedChange={() => onFilterChange("months", [])}
+                  data-testid="checkbox-all-months"
                 >
                   All Months
                 </DropdownMenuCheckboxItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">Select Months</DropdownMenuLabel>
                 {months.map((month) => (
                   <DropdownMenuCheckboxItem
                     key={month}
@@ -76,6 +79,7 @@ export function DashboardHeader({
                         : filters.months.filter(m => m !== month);
                       onFilterChange("months", updated);
                     }}
+                    data-testid={`checkbox-month-${month.toLowerCase().replace(/\s+/g, '-')}`}
                   >
                     {month}
                   </DropdownMenuCheckboxItem>
@@ -103,17 +107,20 @@ export function DashboardHeader({
             <Globe className="h-4 w-4 text-muted-foreground" />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-40 justify-between" data-testid="filter-markets-trigger">
+                <Button variant="outline" className="w-48 justify-between" data-testid="filter-markets-trigger">
                   {filters.markets.length === 0 ? "All Markets" : `${filters.markets.length} selected`}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuContent align="start" className="w-56 max-h-60 overflow-y-auto">
                 <DropdownMenuCheckboxItem
                   checked={filters.markets.length === 0}
                   onCheckedChange={() => onFilterChange("markets", [])}
+                  data-testid="checkbox-all-markets"
                 >
                   All Markets
                 </DropdownMenuCheckboxItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">Select Markets</DropdownMenuLabel>
                 {markets.map((market) => (
                   <DropdownMenuCheckboxItem
                     key={market}
@@ -124,6 +131,7 @@ export function DashboardHeader({
                         : filters.markets.filter(m => m !== market);
                       onFilterChange("markets", updated);
                     }}
+                    data-testid={`checkbox-market-${market.toLowerCase().replace(/\s+/g, '-')}`}
                   >
                     {market}
                   </DropdownMenuCheckboxItem>
