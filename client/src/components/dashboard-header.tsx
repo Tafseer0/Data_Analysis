@@ -1,5 +1,5 @@
 import { CompactFileUpload } from "@/components/file-upload";
-import { BarChart3, Calendar, Globe, Users, X } from "lucide-react";
+import { BarChart3, Calendar, Globe, Users, X, RotateCcw } from "lucide-react";
 import type { FilterState } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import {
@@ -205,6 +205,24 @@ export function DashboardHeader({
               </div>
             )}
           </div>
+
+          {/* Clear All Filters Button */}
+          {(filters.months.length > 0 || filters.markets.length > 0 || filters.contentOwners.length > 0) && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                onFilterChange("months", []);
+                onFilterChange("markets", []);
+                onFilterChange("contentOwners", []);
+              }}
+              data-testid="button-clear-all-filters"
+              className="gap-1"
+            >
+              <RotateCcw className="h-3 w-3" />
+              Clear All
+            </Button>
+          )}
         </div>
       </div>
     </div>
