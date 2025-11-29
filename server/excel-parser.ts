@@ -55,6 +55,21 @@ function detectColumns(headers: string[], abbreviation?: string): {
     };
   }
 
+  // For ATSM sheet, use specific column names
+  if (abbreviation === "ATSM") {
+    return {
+      statusIdx: findColumnIndex(headers, ["up", "status", "url status"]),
+      marketIdx: findColumnIndex(headers, ["market scanned", "market"]),
+      monthIdx: findColumnIndex(headers, ["month", "date", "period", "time"]),
+      contentOwnerIdx: findColumnIndex(headers, ["content owner", "owner"]),
+      urlIdx: findColumnIndex(headers, ["video/posts urls", "video/posts url", "video/post urls", "video/post url", "url", "link"]),
+      withIdx: findColumnIndex(headers, ["with", "associated", "linked"]),
+      googleStatusIdx: findColumnIndex(headers, ["url status google"]),
+      bingStatusIdx: findColumnIndex(headers, ["url status bing"]),
+      yandexStatusIdx: findColumnIndex(headers, ["url status yandex"]),
+    };
+  }
+
   // For PSSM and PSMP, prioritize "URL Status" column detection
   let statusKeywords = ["status", "state", "result"];
   if (abbreviation === "PSSM" || abbreviation === "PSMP") {
@@ -175,7 +190,7 @@ function processSheet(
     if (!statusRaw.trim() && !urlRaw.trim()) continue;
 
     const status = statusRaw.trim() || "Unknown";
-    const normalizedStatus = normalizeStatus(status);
+    const normalizedStatus = normalizeStatus(status, abbreviation);
 
     if (normalizedStatus === "active") activeCount++;
     else if (normalizedStatus === "removed") removedCount++;
