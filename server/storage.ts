@@ -1,37 +1,26 @@
-import { type User, type InsertUser } from "@shared/schema";
+import type { WorkbookAnalysis, SheetData, SheetRecord, SheetAbbreviation } from "@shared/schema";
+import { SHEET_MAPPINGS, SHEET_FULL_NAMES } from "@shared/schema";
 import { randomUUID } from "crypto";
 
-// modify the interface with any CRUD methods
-// you might need
-
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  getWorkbookData(): Promise<WorkbookAnalysis | null>;
+  setWorkbookData(data: WorkbookAnalysis): Promise<void>;
+  clearWorkbookData(): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
-  private users: Map<string, User>;
+  private workbookData: WorkbookAnalysis | null = null;
 
-  constructor() {
-    this.users = new Map();
+  async getWorkbookData(): Promise<WorkbookAnalysis | null> {
+    return this.workbookData;
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+  async setWorkbookData(data: WorkbookAnalysis): Promise<void> {
+    this.workbookData = data;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async clearWorkbookData(): Promise<void> {
+    this.workbookData = null;
   }
 }
 
