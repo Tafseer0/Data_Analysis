@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { FileSpreadsheet } from "lucide-react";
+import { FileSpreadsheet, Grid3x3 } from "lucide-react";
 import type { SheetData, SheetAbbreviation } from "@shared/schema";
 import { SHEET_FULL_NAMES } from "@shared/schema";
 
@@ -67,7 +67,12 @@ interface SheetAnalysisProps {
 export function SheetAnalysis({ sheets }: SheetAnalysisProps) {
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">Sheet-wise Analysis</h2>
+      <div className="flex items-center gap-3 mb-4">
+        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center flex-shrink-0">
+          <Grid3x3 className="h-5 w-5 text-white" />
+        </div>
+        <h2 className="text-xl font-semibold text-teal-600 dark:text-teal-400">Sheet-wise Analysis</h2>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {sheets.map((sheet) => (
           <SheetCard key={sheet.abbreviation} sheet={sheet} />

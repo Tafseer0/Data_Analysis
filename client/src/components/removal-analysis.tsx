@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { CirclePercent, TrendingDown, Link2, Calculator } from "lucide-react";
+import { CirclePercent, TrendingDown, Link2, Calculator, TrendingUp } from "lucide-react";
 import type { SheetData, SheetAbbreviation } from "@shared/schema";
 import { getRemovalRate } from "@/lib/excel-utils";
 
@@ -104,7 +104,12 @@ interface RemovalAnalysisProps {
 export function RemovalAnalysis({ sheets }: RemovalAnalysisProps) {
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">Removal Percentage Analysis</h2>
+      <div className="flex items-center gap-3 mb-4">
+        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center flex-shrink-0">
+          <TrendingUp className="h-5 w-5 text-white" />
+        </div>
+        <h2 className="text-xl font-semibold text-orange-600 dark:text-orange-400">Removal Percentage Analysis</h2>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {sheets.map((sheet) => (
           <RemovalCard key={sheet.abbreviation} sheet={sheet} />

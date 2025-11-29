@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Users, Crown, Trophy, Award, User, Circle } from "lucide-react";
+import { Users, Crown, Trophy, Award, User, Circle, UserCheck } from "lucide-react";
 import type { SheetData, ContentOwnerData, SheetAbbreviation } from "@shared/schema";
 import { calculateContentOwners, filterRecords } from "@/lib/excel-utils";
 
@@ -20,7 +20,12 @@ export function ContentOwnerAnalysis({ sheets, allContentOwners }: ContentOwnerA
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold">Content Owner Analysis</h2>
+      <div className="flex items-center gap-3">
+        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+          <UserCheck className="h-5 w-5 text-white" />
+        </div>
+        <h2 className="text-xl font-semibold text-purple-600 dark:text-purple-400">Content Owner Analysis</h2>
+      </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         <Card className="lg:col-span-3 bg-gradient-to-br from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700">
