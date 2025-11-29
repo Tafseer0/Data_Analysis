@@ -72,7 +72,7 @@ function processSheet(
   worksheet: XLSX.WorkSheet,
   abbreviation: SheetAbbreviation
 ): ProcessSheetResult | null {
-  const jsonData = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, { header: 1 });
+  const jsonData = XLSX.utils.sheet_to_json<unknown[]>(worksheet, { header: 1 });
   
   if (jsonData.length < 2) {
     return {
@@ -104,7 +104,7 @@ function processSheet(
   const startRow = 1;
 
   for (let i = startRow; i < jsonData.length; i++) {
-    const row = jsonData[i] as unknown[];
+    const row = jsonData[i];
     if (!row || row.length === 0) continue;
 
     const hasAnyData = row.some(cell => cell !== null && cell !== undefined && String(cell).trim() !== "");
