@@ -136,7 +136,7 @@ export function MarketAnalysis({
       </div>
 
       <Card className="bg-white/80 dark:bg-green-900/30 border-green-200 dark:border-green-800 overflow-hidden">
-        <ScrollArea className="max-h-96">
+        <ScrollArea className="h-full max-h-screen" style={{ minHeight: "400px" }}>
           <Table>
             <TableHeader className="bg-green-50 dark:bg-green-900/50 sticky top-0">
               <TableRow>
