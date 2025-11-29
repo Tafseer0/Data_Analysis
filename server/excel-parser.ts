@@ -100,17 +100,34 @@ function processSheet(
   const startRow = 1;
 
   for (let i = startRow; i < jsonData.length; i++) {
-    const row = jsonData[i];
+    const row = jsonData[i] as unknown[];
     if (!row || row.length === 0) continue;
 
-    const hasAnyData = row.some(cell => cell !== null && cell !== undefined && String(cell).trim() !== "");
+    // Only skip completely empty rows
+    const hasAnyData = row.some(cell => {
+      const cellStr = String(cell || "").trim();
+      return cellStr !== "" && cellStr !== "null" && cellStr !== "undefined";
+    });
     if (!hasAnyData) continue;
 
-    const statusRaw = columns.statusIdx >= 0 ? String(row[columns.statusIdx] || "") : "";
+    // Get values from detected columns, or use first few columns as fallback
+    let statusRaw = columns.statusIdx >= 0 ? String(row[columns.statusIdx] || "") : "";
+    let urlRaw = columns.urlIdx >= 0 ? String(row[columns.urlIdx] || "") : "";
+    
+    // If we can't find important columns, try first few columns
+    if (!statusRaw && columns.statusIdx === -1 && row[0]) {
+      statusRaw = String(row[0]);
+    }
+    if (!urlRaw && columns.urlIdx === -1 && row[1]) {
+      urlRaw = String(row[1]);
+    }
+
     const marketRaw = columns.marketIdx >= 0 ? String(row[columns.marketIdx] || "") : "";
     const monthRaw = columns.monthIdx >= 0 ? String(row[columns.monthIdx] || "") : "";
     const contentOwnerRaw = columns.contentOwnerIdx >= 0 ? String(row[columns.contentOwnerIdx] || "") : "";
-    const urlRaw = columns.urlIdx >= 0 ? String(row[columns.urlIdx] || "") : "";
+
+    // Skip rows that have neither status nor URL
+    if (!statusRaw.trim() && !urlRaw.trim()) continue;
 
     const status = statusRaw.trim() || "Unknown";
     const normalizedStatus = normalizeStatus(status);
