@@ -190,19 +190,43 @@ function processSheet(
     let statusRaw = columns.statusIdx >= 0 ? String(row[columns.statusIdx] || "") : "";
     let urlRaw = columns.urlIdx >= 0 ? String(row[columns.urlIdx] || "") : "";
     
-    // For USR sheet, use Google/Bing/Yandex status columns if available
-    if (abbreviation === "USR" && !statusRaw.trim()) {
+    // For USR sheet, check all three Google/Bing/Yandex status columns
+    let normalizedStatus: "active" | "removed" | "unknown" = "unknown";
+    if (abbreviation === "USR") {
       const googleStatus = columns.googleStatusIdx >= 0 ? String(row[columns.googleStatusIdx] || "").trim() : "";
       const bingStatus = columns.bingStatusIdx >= 0 ? String(row[columns.bingStatusIdx] || "").trim() : "";
       const yandexStatus = columns.yandexStatusIdx >= 0 ? String(row[columns.yandexStatusIdx] || "").trim() : "";
       
-      // Use the first available status from Google, Bing, or Yandex
-      statusRaw = googleStatus || bingStatus || yandexStatus;
+      // For USR, if ANY column has "Approved" or "Up", count as Active
+      // If all are "Pending", count as Removed
+      const allStatuses = [googleStatus, bingStatus, yandexStatus].filter(s => s);
+      const hasActiveStatus = allStatuses.some(s => s.toLowerCase() === "approved" || s.toLowerCase() === "up");
+      const allPending = allStatuses.length > 0 && allStatuses.every(s => s.toLowerCase() === "pending");
+      
+      if (hasActiveStatus) {
+        normalizedStatus = "active";
+        statusRaw = "Approved/Up";
+      } else if (allPending) {
+        normalizedStatus = "removed";
+        statusRaw = "Pending";
+      } else if (allStatuses.length > 0) {
+        statusRaw = allStatuses[0];
+      }
+    } else {
+      // For other sheets, use standard column detection
+      if (!statusRaw.trim()) {
+        statusRaw = "";
+      }
+      const status = statusRaw.trim() || "Unknown";
+      normalizedStatus = normalizeStatus(status, abbreviation);
     }
     
     // If we can't find important columns, try first few columns
     if (!statusRaw && columns.statusIdx === -1 && row[0]) {
       statusRaw = String(row[0]);
+      if (abbreviation !== "USR") {
+        normalizedStatus = normalizeStatus(statusRaw, abbreviation);
+      }
     }
     if (!urlRaw && columns.urlIdx === -1 && row[1]) {
       urlRaw = String(row[1]);
@@ -216,7 +240,9 @@ function processSheet(
     if (!statusRaw.trim() && !urlRaw.trim()) continue;
 
     const status = statusRaw.trim() || "Unknown";
-    const normalizedStatus = normalizeStatus(status, abbreviation);
+    if (abbreviation !== "USR" && normalizedStatus === "unknown") {
+      normalizedStatus = normalizeStatus(status, abbreviation);
+    }
 
     if (normalizedStatus === "active") activeCount++;
     else if (normalizedStatus === "removed") removedCount++;
