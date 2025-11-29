@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Link2, TrendingUp, TrendingDown, Percent, FileText, ShieldCheck } from "lucide-react";
+import { Link2, TrendingUp, TrendingDown, Percent, FileText, ShieldCheck, BarChart3 } from "lucide-react";
 
 interface SummaryCardProps {
   title: string;
@@ -57,7 +57,12 @@ export function OverallSummary({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold mb-4">Overall Summary</h2>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+            <BarChart3 className="h-5 w-5 text-white" />
+          </div>
+          <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-400">Overall Summary</h2>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <SummaryCard
             title="Total URLs"
