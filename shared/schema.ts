@@ -70,9 +70,9 @@ export const workbookAnalysisSchema = z.object({
 export type WorkbookAnalysis = z.infer<typeof workbookAnalysisSchema>;
 
 export const filterStateSchema = z.object({
-  month: z.string(),
-  market: z.string(),
-  contentOwner: z.string(),
+  months: z.array(z.string()),
+  markets: z.array(z.string()),
+  contentOwners: z.array(z.string()),
 });
 
 export type FilterState = z.infer<typeof filterStateSchema>;

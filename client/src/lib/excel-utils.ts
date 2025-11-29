@@ -80,14 +80,14 @@ export function calculateContentOwners(records: SheetRecord[]): ContentOwnerData
 
 export function filterRecords(
   records: SheetRecord[],
-  month: string,
-  market: string,
-  contentOwner: string
+  months: string[],
+  markets: string[],
+  contentOwners: string[]
 ): SheetRecord[] {
   return records.filter(record => {
-    if (month !== "all" && record.month !== month) return false;
-    if (market !== "all" && record.market !== market) return false;
-    if (contentOwner !== "all" && record.contentOwner !== contentOwner) return false;
+    if (months.length > 0 && record.month && !months.includes(record.month)) return false;
+    if (markets.length > 0 && record.market && !markets.includes(record.market)) return false;
+    if (contentOwners.length > 0 && record.contentOwner && !contentOwners.includes(record.contentOwner)) return false;
     return true;
   });
 }

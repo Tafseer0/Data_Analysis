@@ -99,9 +99,9 @@ function LoadingSkeleton() {
 export default function Dashboard() {
   const { toast } = useToast();
   const [filters, setFilters] = useState<FilterState>({
-    month: "all",
-    market: "all",
-    contentOwner: "all",
+    months: [],
+    markets: [],
+    contentOwners: [],
   });
   const [marketCountryFilter, setMarketCountryFilter] = useState("all");
 
@@ -144,7 +144,7 @@ export default function Dashboard() {
     uploadMutation.mutate(file);
   }, [uploadMutation]);
 
-  const handleFilterChange = useCallback((key: keyof FilterState, value: string) => {
+  const handleFilterChange = useCallback((key: keyof FilterState, value: string[]) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   }, []);
 
@@ -154,9 +154,9 @@ export default function Dashboard() {
     const filteredSheets: SheetData[] = workbookData.sheets.map(sheet => {
       const filteredRecords = filterRecords(
         sheet.records,
-        filters.month,
-        filters.market,
-        filters.contentOwner
+        filters.months,
+        filters.markets,
+        filters.contentOwners
       );
       const stats = calculateSheetStats(filteredRecords);
       return {
