@@ -41,22 +41,16 @@ function getSheetAbbreviation(sheetName: string): SheetAbbreviation | null {
   const normalized = sheetName.trim();
   const lowerName = normalized.toLowerCase();
   
-  for (const [fullName, abbr] of Object.entries(SHEET_MAPPINGS)) {
-    if (lowerName.includes(fullName.toLowerCase().substring(0, 15))) {
-      return abbr as SheetAbbreviation;
-    }
-  }
+  // Direct exact match or high confidence substring match
+  const sheetLower = lowerName.toLowerCase();
+  if (sheetLower.includes("unauthorized search") || sheetLower === "usr" || sheetLower.includes("a.")) return "USR";
+  if (sheetLower.includes("ads tutorial") || sheetLower === "atsm" || sheetLower.includes("b1")) return "ATSM";
+  if (sheetLower.includes("password sharing-social") || sheetLower.includes("password sharing - social") || sheetLower === "pssm" || sheetLower.includes("c1")) return "PSSM";
+  if (sheetLower.includes("password sharing-marketplace") || sheetLower.includes("password sharing - marketplace") || sheetLower === "psmp" || sheetLower.includes("c2")) return "PSMP";
 
-  const upperName = normalized.toUpperCase();
-  if (upperName === "USR" || lowerName.includes("unauthorized search")) return "USR";
-  if (upperName === "ATSM" || lowerName.includes("ads tutorial")) return "ATSM";
-  if (upperName === "PSSM" || (lowerName.includes("password") && lowerName.includes("social"))) return "PSSM";
-  if (upperName === "PSMP" || (lowerName.includes("password") && lowerName.includes("market"))) return "PSMP";
-
-  if (lowerName.includes("b1") || lowerName.includes("ads tutorials")) return "ATSM";
-  if (lowerName.includes("c1") || lowerName.includes("c1.")) return "PSSM";
-  if (lowerName.includes("c2") || lowerName.includes("c2.")) return "PSMP";
-  if (lowerName.includes("a.") || lowerName.startsWith("a ")) return "USR";
+  // Fallback for variations
+  if (lowerName.includes("password") && lowerName.includes("social")) return "PSSM";
+  if (lowerName.includes("password") && lowerName.includes("market")) return "PSMP";
 
   return null;
 }
