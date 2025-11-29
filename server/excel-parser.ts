@@ -32,8 +32,14 @@ function detectColumns(headers: string[], abbreviation?: string): {
   bingStatusIdx: number;
   yandexStatusIdx: number;
 } {
+  // For PSSM and PSMP, prioritize "URL Status" column detection
+  let statusKeywords = ["status", "state", "result"];
+  if (abbreviation === "PSSM" || abbreviation === "PSMP") {
+    statusKeywords = ["url status", "status"];
+  }
+
   return {
-    statusIdx: findColumnIndex(headers, ["status", "state", "result", "url status"]),
+    statusIdx: findColumnIndex(headers, statusKeywords),
     marketIdx: findColumnIndex(headers, ["market", "country", "region", "location", "geo"]),
     monthIdx: findColumnIndex(headers, ["month", "date", "period", "time"]),
     contentOwnerIdx: findColumnIndex(headers, ["content owner", "owner", "content_owner", "contentowner", "rights holder", "rightsholder"]),
