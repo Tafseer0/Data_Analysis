@@ -27,7 +27,12 @@ export function MarketAnalysis({
   const currentSheet = sheets.find(s => s.abbreviation === activeSheet);
   
   const filteredRecords = currentSheet 
-    ? filterRecords(currentSheet.records, "all", selectedCountry, "all")
+    ? filterRecords(
+        currentSheet.records,
+        [],
+        selectedCountry === "all" ? [] : [selectedCountry],
+        []
+      )
     : [];
   
   const marketData = calculateMarketData(filteredRecords);
