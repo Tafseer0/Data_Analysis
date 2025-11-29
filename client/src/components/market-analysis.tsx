@@ -135,36 +135,62 @@ export function MarketAnalysis({
           <Table>
             <TableHeader className="bg-green-50 dark:bg-green-900/50 sticky top-0">
               <TableRow>
-                <TableHead className="text-green-700 dark:text-green-300 font-semibold">Market Scanned</TableHead>
-                <TableHead className="text-green-700 dark:text-green-300 font-semibold text-center">Active</TableHead>
-                <TableHead className="text-green-700 dark:text-green-300 font-semibold text-center">Removed</TableHead>
-                <TableHead className="text-green-700 dark:text-green-300 font-semibold text-right">Total URLs</TableHead>
+                <TableHead className="text-green-700 dark:text-green-300 font-semibold min-w-32">Market Scanned</TableHead>
+                <TableHead className="text-green-700 dark:text-green-300 font-semibold text-center min-w-28">Active</TableHead>
+                <TableHead className="text-green-700 dark:text-green-300 font-semibold text-center min-w-28">Removed</TableHead>
+                <TableHead className="text-green-700 dark:text-green-300 font-semibold text-right min-w-32">Ratio</TableHead>
+                <TableHead className="text-green-700 dark:text-green-300 font-semibold text-right min-w-28">Total</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {marketData.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                     No market data available
                   </TableCell>
                 </TableRow>
               ) : (
-                marketData.map((market, idx) => (
-                  <TableRow key={`${market.market}-${idx}`} data-testid={`row-market-${idx}`}>
-                    <TableCell className="font-medium">{market.market}</TableCell>
-                    <TableCell className="text-center">
-                      <Badge variant="outline" className="bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-700">
-                        {market.activeCount.toLocaleString()}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Badge variant="outline" className="bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-700">
-                        {market.removedCount.toLocaleString()}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right font-medium">{market.totalUrls.toLocaleString()}</TableCell>
-                  </TableRow>
-                ))
+                marketData
+                  .sort((a, b) => b.totalUrls - a.totalUrls)
+                  .map((market, idx) => {
+                    const activePercent = market.totalUrls > 0 ? (market.activeCount / market.totalUrls) * 100 : 0;
+                    const removedPercent = 100 - activePercent;
+                    return (
+                      <TableRow key={`${market.market}-${idx}`} data-testid={`row-market-${idx}`} className="hover:bg-green-50/50 dark:hover:bg-green-900/20">
+                        <TableCell className="font-medium text-green-900 dark:text-green-100">{market.market}</TableCell>
+                        <TableCell className="text-center">
+                          <div className="flex flex-col items-center gap-1">
+                            <Badge variant="outline" className="bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-700 text-xs">
+                              {market.activeCount.toLocaleString()}
+                            </Badge>
+                            <span className="text-xs text-green-600 dark:text-green-400 font-medium">{activePercent.toFixed(0)}%</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="flex flex-col items-center gap-1">
+                            <Badge variant="outline" className="bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-700 text-xs">
+                              {market.removedCount.toLocaleString()}
+                            </Badge>
+                            <span className="text-xs text-red-600 dark:text-red-400 font-medium">{removedPercent.toFixed(0)}%</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center gap-2 justify-end pr-2">
+                            <div className="w-20 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-green-400 to-green-600 dark:from-green-500 dark:to-green-400"
+                                style={{ width: `${activePercent}%` }}
+                              />
+                            </div>
+                            <span className="text-xs font-medium text-green-700 dark:text-green-300 w-8 text-right">
+                              {activePercent.toFixed(0)}%
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right font-semibold text-green-900 dark:text-green-100">{market.totalUrls.toLocaleString()}</TableCell>
+                      </TableRow>
+                    );
+                  })
               )}
             </TableBody>
           </Table>
