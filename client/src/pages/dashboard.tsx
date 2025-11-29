@@ -178,8 +178,10 @@ export default function Dashboard() {
     const pssmSheet = filteredSheets.find(s => s.abbreviation === "PSSM");
     const psmpSheet = filteredSheets.find(s => s.abbreviation === "PSMP");
 
-    const usrAtsmCount = (usrSheet?.totalUrls || 0) + (atsmSheet?.totalUrls || 0);
-    const pssmPsmpCount = (pssmSheet?.totalUrls || 0) + (psmpSheet?.totalUrls || 0);
+    const usrCount = usrSheet?.totalUrls || 0;
+    const atsmCount = atsmSheet?.totalUrls || 0;
+    const pssmCount = pssmSheet?.totalUrls || 0;
+    const psmpCount = psmpSheet?.totalUrls || 0;
 
     const allRecords = filteredSheets.flatMap(s => s.records);
     const contentOwners = calculateContentOwners(allRecords);
@@ -190,8 +192,10 @@ export default function Dashboard() {
       activeCount,
       removedCount,
       removalRate,
-      usrAtsmCount,
-      pssmPsmpCount,
+      usrCount,
+      atsmCount,
+      pssmCount,
+      psmpCount,
       contentOwners,
     };
   }, [workbookData, filters]);
@@ -238,8 +242,10 @@ export default function Dashboard() {
               activeCount={filteredData.activeCount}
               removedCount={filteredData.removedCount}
               removalRate={filteredData.removalRate}
-              usrAtsmCount={filteredData.usrAtsmCount}
-              pssmPsmpCount={filteredData.pssmPsmpCount}
+              usrCount={filteredData.usrCount}
+              atsmCount={filteredData.atsmCount}
+              pssmCount={filteredData.pssmCount}
+              psmpCount={filteredData.psmpCount}
             />
 
             <SheetAnalysis sheets={filteredData.sheets} />

@@ -21,13 +21,16 @@ function findColumnIndex(headers: string[], keywords: string[]): number {
   return -1;
 }
 
-function detectColumns(headers: string[]): {
+function detectColumns(headers: string[], abbreviation?: string): {
   statusIdx: number;
   marketIdx: number;
   monthIdx: number;
   contentOwnerIdx: number;
   urlIdx: number;
   withIdx: number;
+  googleStatusIdx: number;
+  bingStatusIdx: number;
+  yandexStatusIdx: number;
 } {
   return {
     statusIdx: findColumnIndex(headers, ["status", "state", "result"]),
@@ -36,6 +39,9 @@ function detectColumns(headers: string[]): {
     contentOwnerIdx: findColumnIndex(headers, ["content owner", "owner", "content_owner", "contentowner", "rights holder", "rightsholder"]),
     urlIdx: findColumnIndex(headers, ["url", "link", "address", "uri"]),
     withIdx: findColumnIndex(headers, ["with", "associated", "linked"]),
+    googleStatusIdx: findColumnIndex(headers, ["url status google"]),
+    bingStatusIdx: findColumnIndex(headers, ["url status bing"]),
+    yandexStatusIdx: findColumnIndex(headers, ["url status yandex"]),
   };
 }
 
@@ -87,7 +93,7 @@ function processSheet(
   }
 
   const headers = (jsonData[0] as unknown[]).map(h => String(h || ""));
-  const columns = detectColumns(headers);
+  const columns = detectColumns(headers, abbreviation);
 
   const records: SheetRecord[] = [];
   const monthsSet = new Set<string>();
@@ -113,6 +119,16 @@ function processSheet(
     // Get values from detected columns, or use first few columns as fallback
     let statusRaw = columns.statusIdx >= 0 ? String(row[columns.statusIdx] || "") : "";
     let urlRaw = columns.urlIdx >= 0 ? String(row[columns.urlIdx] || "") : "";
+    
+    // For USR sheet, use Google/Bing/Yandex status columns
+    if (abbreviation === "USR") {
+      const googleStatus = columns.googleStatusIdx >= 0 ? String(row[columns.googleStatusIdx] || "").trim() : "";
+      const bingStatus = columns.bingStatusIdx >= 0 ? String(row[columns.bingStatusIdx] || "").trim() : "";
+      const yandexStatus = columns.yandexStatusIdx >= 0 ? String(row[columns.yandexStatusIdx] || "").trim() : "";
+      
+      // Use the first available status from Google, Bing, or Yandex
+      statusRaw = googleStatus || bingStatus || yandexStatus || statusRaw;
+    }
     
     // If we can't find important columns, try first few columns
     if (!statusRaw && columns.statusIdx === -1 && row[0]) {
