@@ -1,8 +1,8 @@
 import type { SheetData, SheetRecord, WorkbookAnalysis, MarketData, ContentOwnerData, SheetAbbreviation } from "@shared/schema";
 import { SHEET_MAPPINGS, SHEET_FULL_NAMES } from "@shared/schema";
 
-const STATUS_ACTIVE_KEYWORDS = ["active", "up", "live", "online", "available"];
-const STATUS_REMOVED_KEYWORDS = ["removed", "down", "offline", "deleted", "taken down", "unavailable"];
+const STATUS_ACTIVE_KEYWORDS = ["active", "up", "live", "online", "available", "approved"];
+const STATUS_REMOVED_KEYWORDS = ["removed", "down", "offline", "deleted", "taken down", "unavailable", "pending"];
 
 export function normalizeStatus(status: string): "active" | "removed" | "unknown" {
   const lower = status.toLowerCase().trim();
