@@ -7,7 +7,7 @@ import { parseExcelFile } from "./excel-parser";
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB limit
+    fileSize: 200 * 1024 * 1024, // 200MB limit
   },
   fileFilter: (_req, file, cb) => {
     const allowedMimes = [
@@ -100,7 +100,7 @@ export async function registerRoutes(
   app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
     if (err instanceof multer.MulterError) {
       if (err.code === "LIMIT_FILE_SIZE") {
-        return res.status(400).json({ message: "File is too large. Maximum size is 50MB." });
+        return res.status(400).json({ message: "File is too large. Maximum size is 200MB." });
       }
       return res.status(400).json({ message: err.message });
     }
