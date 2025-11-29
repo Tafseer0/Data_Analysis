@@ -2,8 +2,8 @@ import * as XLSX from "xlsx";
 import type { SheetData, SheetRecord, SheetAbbreviation, WorkbookAnalysis } from "@shared/schema";
 import { SHEET_MAPPINGS, SHEET_FULL_NAMES } from "@shared/schema";
 
-const STATUS_ACTIVE_KEYWORDS = ["active", "up", "live", "online", "available"];
-const STATUS_REMOVED_KEYWORDS = ["removed", "down", "offline", "deleted", "taken down", "unavailable"];
+const STATUS_ACTIVE_KEYWORDS = ["active", "up", "live", "online", "available", "approved"];
+const STATUS_REMOVED_KEYWORDS = ["removed", "down", "offline", "deleted", "taken down", "unavailable", "pending"];
 
 function normalizeStatus(status: string): "active" | "removed" | "unknown" {
   if (!status) return "unknown";
@@ -27,6 +27,7 @@ function detectColumns(headers: string[]): {
   monthIdx: number;
   contentOwnerIdx: number;
   urlIdx: number;
+  withIdx: number;
 } {
   return {
     statusIdx: findColumnIndex(headers, ["status", "state", "result"]),
@@ -34,6 +35,7 @@ function detectColumns(headers: string[]): {
     monthIdx: findColumnIndex(headers, ["month", "date", "period", "time"]),
     contentOwnerIdx: findColumnIndex(headers, ["content owner", "owner", "content_owner", "contentowner", "rights holder", "rightsholder"]),
     urlIdx: findColumnIndex(headers, ["url", "link", "address", "uri"]),
+    withIdx: findColumnIndex(headers, ["with", "associated", "linked"]),
   };
 }
 
